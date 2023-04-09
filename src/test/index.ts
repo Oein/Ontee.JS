@@ -22,5 +22,7 @@ onteeWindow.setBackground(
   image.get(await image.load(`https://bit.ly/3Gvbd6G`))
 );
 
-onteeWindow.bgm.set("https://github.com/Oein/Oein/raw/main/04%20comet.mp3");
+onteeWindow.bgm.set(
+  "https://file-examples.com/storage/fe9278ad7f642dbd39ac5c9/2017/11/file_example_MP3_5MG.mp3"
+);
 onteeWindow.bgm.play();
