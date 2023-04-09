@@ -151,6 +151,16 @@ function async requestFullscreen(): void
 
 #### Ontee.OnteeWindow.fullscreen.exitFullscreen
 
+Exit fullscreen ontee element
+
 ```ts
 function exitFullscreen(): void;
+```
+
+#### Ontee.OnteeWindow.fullscreen.toggleFullscreen
+
+Toggle fullscreen ontee element
+
+```ts
+function async toggleFullscreen(): void
 ```
