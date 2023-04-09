@@ -8,6 +8,15 @@ Typescript based virtual novel game engine
 
 wip
 
+# Features
+
+- [x] Responsive to any screen sizes (on default settings)
+- [x] Voice supported
+- [x] Image caching supported
+- [x] Typescript supported
+- [x] HTML based overlay support
+- [x] Video, image, color background supported
+
 # Example Usage
 
 index.html
