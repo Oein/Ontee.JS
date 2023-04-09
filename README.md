@@ -1,4 +1,6 @@
-# Ontee(온티) Engine
+<img src="https://raw.githubusercontent.com/Oein/Ontee.JS/master/images/Ontee_garo.svg" style="width: 100%;"></img>
+
+# Ontee(온티).JS
 
 Typescript based virtual novel game engine
 
