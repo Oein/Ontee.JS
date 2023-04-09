@@ -164,3 +164,11 @@ Toggle fullscreen ontee element
 ```ts
 function async toggleFullscreen(): void
 ```
+
+#### Ontee.OnteeWindow.fullscreen.setFullscreen
+
+Set fullscreen ontee element
+
+```ts
+function async setFullscreen(isFullscreen: boolean): void
+```
