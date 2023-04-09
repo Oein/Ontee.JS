@@ -228,7 +228,7 @@ function setVideoBackground(
 
 ### Ontee.OnteeWindow.bgm
 
-#### Ontee.OnteeWindow.bgm.set
+#### [Ontee.OnteeWindow.bgm.set](https://github.com/Oein/Ontee.JS/blob/master/exampleCodes/Ontee.OnteeWindow.bgm.set.md)
 
 Set the bgm url
 
@@ -236,7 +236,7 @@ Set the bgm url
 function set(url: string): void;
 ```
 
-#### Ontee.OnteeWindow.bgm.play
+#### [Ontee.OnteeWindow.bgm.play](https://github.com/Oein/Ontee.JS/blob/master/exampleCodes/Ontee.OnteeWindow.bgm.play.md)
 
 Play the bgm
 
@@ -244,7 +244,7 @@ Play the bgm
 function play(): void;
 ```
 
-#### Ontee.OnteeWindow.bgm.pause
+#### [Ontee.OnteeWindow.bgm.pause](https://github.com/Oein/Ontee.JS/blob/master/exampleCodes/Ontee.OnteeWindow.bgm.pause.md)
 
 Pause the bgm
 
