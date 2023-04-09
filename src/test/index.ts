@@ -1,4 +1,4 @@
-import ontee from "../ontee";
+import ontee, { image } from "../ontee";
 
 let onteeWindow = ontee.init("ont");
 let i = 0;
@@ -17,6 +17,10 @@ sayer();
 // let vid = document.createElement("video");
 // vid.src = `http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4`;
 // onteeWindow.setVideoBackground(vid);
+
+onteeWindow.setBackground(
+  image.get(await image.load(`https://bit.ly/3Gvbd6G`))
+);
 
 onteeWindow.bgm.set("https://github.com/Oein/Oein/raw/main/04%20comet.mp3");
 onteeWindow.bgm.play();
