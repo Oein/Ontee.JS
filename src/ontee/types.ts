@@ -56,7 +56,12 @@ export interface OnteeWindow {
     setFullscreen: (isFullscreen: boolean) => Promise<void>;
   };
   dialogue: {
-    say: (name: string, line: string, next: () => void) => void;
+    say: (
+      name: string,
+      line: string,
+      next: () => void,
+      voiceURL?: string
+    ) => void;
   };
   requestFrame: () => void;
   setBackground: (background: HTMLImageElement | string) => void;
@@ -68,6 +73,11 @@ export interface OnteeWindow {
   varables: { [key: string]: any };
   bgm: {
     set: (url: string) => void;
+    play: () => void;
+    pause: () => void;
+  };
+  voice: {
+    set: (url: string, callback: () => void) => void;
     play: () => void;
     pause: () => void;
   };

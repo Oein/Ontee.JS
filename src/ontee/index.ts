@@ -101,6 +101,12 @@ const ontee = {
     bgmElement.id = `ontee${onteeid}-bgm-${onteeid}`;
     onteeElement.appendChild(bgmElement);
 
+    let voiceElement = document.createElement("audio");
+    voiceElement.style.display = "none";
+    voiceElement.loop = false;
+    voiceElement.id = `ontee${onteeid}-voice-${onteeid}`;
+    onteeElement.appendChild(voiceElement);
+
     let onteeWin: OnteeWindow = {
       onteeElement: onteeElement,
       canvasElement: canvas,
@@ -233,7 +239,12 @@ const ontee = {
         },
       },
       dialogue: {
-        say(name: string, line: string, next: () => void) {
+        say(
+          name: string,
+          line: string,
+          next: () => void = () => {},
+          voiceURL?: string
+        ) {
           // get new line element
           let ele = options!.dialogue!.dialogueElementGenerator!(name, line);
 
@@ -251,6 +262,7 @@ const ontee = {
           fetchDialogueOverlay(onteeWin);
 
           const callNextLine = () => {
+            onteeWin.voice.pause();
             document.removeEventListener("keydown", keydown);
             onteeWin.onteeElement.removeEventListener("mousedown", mousedown);
             onteeWin.overlay.overlays
@@ -278,6 +290,10 @@ const ontee = {
           };
           document.addEventListener("keydown", keydown);
           onteeWin.onteeElement.addEventListener("mousedown", mousedown);
+          if (voiceURL) {
+            onteeWin.voice.set(voiceURL, () => {});
+            onteeWin.voice.play();
+          }
         },
       },
       bgm: {
@@ -292,6 +308,21 @@ const ontee = {
         },
         pause() {
           bgmElement.pause();
+        },
+      },
+      voice: {
+        set(url: string, callback?: () => void) {
+          voiceElement.src = url;
+          voiceElement.onload = () => {
+            voiceElement.play();
+            if (callback) voiceElement.addEventListener("ended", callback);
+          };
+        },
+        play() {
+          voiceElement.play();
+        },
+        pause() {
+          voiceElement.pause();
         },
       },
       requestFrame() {

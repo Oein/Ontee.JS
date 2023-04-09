@@ -186,7 +186,9 @@ function say(
   // message to say
   line: string,
   // callback function to call when player requests the next message
-  next: () => void
+  next?: () => void,
+  // Voice audio file url
+  voiceURL?: string
 ): void;
 ```
 
@@ -247,6 +249,30 @@ function play(): void;
 #### [Ontee.OnteeWindow.bgm.pause](https://github.com/Oein/Ontee.JS/blob/master/exampleCodes/Ontee.OnteeWindow.bgm.pause.md)
 
 Pause the bgm
+
+```ts
+function pause(): void;
+```
+
+#### [Ontee.OnteeWindow.voice.set](https://github.com/Oein/Ontee.JS/blob/master/exampleCodes/Ontee.OnteeWindow.voice.set.md)
+
+Set the voice url
+
+```ts
+function set(url: string): void;
+```
+
+#### [Ontee.OnteeWindow.voice.play](https://github.com/Oein/Ontee.JS/blob/master/exampleCodes/Ontee.OnteeWindow.voice.play.md)
+
+Play the voice
+
+```ts
+function play(): void;
+```
+
+#### [Ontee.OnteeWindow.voice.pause](https://github.com/Oein/Ontee.JS/blob/master/exampleCodes/Ontee.OnteeWindow.voice.pause.md)
+
+Pause the voice
 
 ```ts
 function pause(): void;
