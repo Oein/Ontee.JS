@@ -5,6 +5,7 @@ export interface OnteeInitOptions {
     dialogueElementGenerator?: (name: string, line: string) => Element;
     getCharacterNameFontSizePixel?: (height: number) => number | string;
     getLineFontSizePixel?: (height: number) => number | string;
+    saySpeed?: number;
   };
 }
 

@@ -30,6 +30,8 @@ interface OnteeInitOptions {
     getCharacterNameFontSizePixel: function;
     // Returns line's font size (px)
     getLineFontSizePixel: function;
+    // Say speed (ms)
+    saySpeed: number;
   };
 }
 ```

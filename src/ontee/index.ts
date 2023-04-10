@@ -19,6 +19,7 @@ const ontee = {
         width: 1920,
         height: 1080,
         dialogue: {
+          saySpeed: 25,
           getCharacterNameFontSizePixel: (height: number) => {
             return height / 2.5;
           },
@@ -245,23 +246,47 @@ const ontee = {
           next: () => void = () => {},
           voiceURL?: string
         ) {
-          // get new line element
-          let ele = options!.dialogue!.dialogueElementGenerator!(name, line);
+          let sayDone = false;
+          let inter = setTimeout(() => {});
+          const sayer = (index: number) => {
+            if (index - 1 == line.length || sayDone) {
+              sayDone = true;
+              return;
+            }
+            // get new line element
+            let ele = options!.dialogue!.dialogueElementGenerator!(
+              name,
+              line.slice(0, index)
+            );
 
-          // get old lines
-          let alrea = onteeWin.overlay.overlays.filter(
-            (i) => i.id == "dialogue"
-          );
+            // get old lines
+            let alrea = onteeWin.overlay.overlays.filter(
+              (i) => i.id == "dialogue"
+            );
 
-          // detach old lines
-          if (alrea.length > 0)
-            alrea.forEach((i) => onteeWin.overlay.detach(i.id));
-          onteeWin.overlay.attach(ele, "dialogue");
+            // detach old lines
+            if (alrea.length > 0)
+              alrea.forEach((i) => onteeWin.overlay.detach(i.id));
+            onteeWin.overlay.attach(ele, "dialogue");
 
-          // fetchSize
-          fetchDialogueOverlay(onteeWin);
+            // fetchSize
+            fetchDialogueOverlay(onteeWin);
+
+            inter = setTimeout(
+              sayer,
+              onteeWin.options.dialogue?.saySpeed || 25,
+              index + 1
+            );
+          };
+
+          inter = setTimeout(sayer, 0, 0);
 
           const callNextLine = () => {
+            if (!sayDone) {
+              clearInterval(inter);
+              sayer(line.length);
+              return;
+            }
             onteeWin.voice.pause();
             document.removeEventListener("keydown", keydown);
             onteeWin.onteeElement.removeEventListener("mousedown", mousedown);
@@ -350,15 +375,16 @@ const ontee = {
         backgroundUnderlay.style.backgroundColor = "black";
         backgroundUnderlay.style.backgroundImage = "";
 
+        backgroundUnderlay.appendChild(video);
+
         video.autoplay = true;
         video.loop = loop;
         video.controls = false;
-        video.setMediaKeys(null);
+
         if (endHandler) video.addEventListener("ended", endHandler);
 
         styled(video, "background_video");
 
-        backgroundUnderlay.appendChild(video);
         video.load();
       },
     };
@@ -392,10 +418,20 @@ export let imageStorage: {
   [key: string]: HTMLImageElement;
 } = {};
 
+export let urlToImgid: {
+  [key: string]: string;
+} = {};
+
 export let image = {
   load: (url: string, customID?: string) => {
     return new Promise<string>((resolve) => {
       let ui_ = customID || "ontee_image" + uid();
+      if (typeof urlToImgid[url] != "undefined") ui_ = urlToImgid[url];
+
+      if (typeof imageStorage[ui_] != "undefined") {
+        return resolve(ui_);
+      }
+
       imageStorage[ui_] = new Image();
       imageStorage[ui_].src = url;
       imageStorage[ui_].onload = () => {
