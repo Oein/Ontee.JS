@@ -9,8 +9,15 @@ import {
   OnteeInitOptions,
   OnteeWindow,
 } from "./types";
+import { image } from "./controllers/image";
 
 jsStler();
+
+let runner =
+  (window as any).requestAnimationFrame ||
+  (window as any).mozRequestAnimationFrame ||
+  (window as any).msRequestAnimationFrame ||
+  (window as any).msRequestAnimationFrame;
 
 const ontee = {
   init: (onteeid: string, options?: OnteeInitOptions): OnteeWindow => {
@@ -89,12 +96,6 @@ const ontee = {
 
     let ctx = canvas.getContext("2d");
     while (ctx == null) ctx = canvas.getContext("2d");
-
-    let runner =
-      (window as any).requestAnimationFrame ||
-      (window as any).mozRequestAnimationFrame ||
-      (window as any).msRequestAnimationFrame ||
-      (window as any).msRequestAnimationFrame;
 
     let bgmElement = document.createElement("audio");
     bgmElement.style.display = "none";
@@ -412,36 +413,7 @@ const ontee = {
 
     return onteeWin;
   },
-};
-
-export let imageStorage: {
-  [key: string]: HTMLImageElement;
-} = {};
-
-export let urlToImgid: {
-  [key: string]: string;
-} = {};
-
-export let image = {
-  load: (url: string, customID?: string) => {
-    return new Promise<string>((resolve) => {
-      let ui_ = customID || "ontee_image" + uid();
-      if (typeof urlToImgid[url] != "undefined") ui_ = urlToImgid[url];
-
-      if (typeof imageStorage[ui_] != "undefined") {
-        return resolve(ui_);
-      }
-
-      imageStorage[ui_] = new Image();
-      imageStorage[ui_].src = url;
-      imageStorage[ui_].onload = () => {
-        resolve(ui_);
-      };
-    });
-  },
-  get: (id: string) => {
-    return imageStorage[id];
-  },
+  image: image,
 };
 
 export default ontee;

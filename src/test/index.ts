@@ -1,4 +1,4 @@
-import ontee, { image } from "../ontee";
+import ontee from "../ontee";
 
 let onteeWindow = ontee.init("ont");
 let i = 0;
@@ -19,7 +19,7 @@ sayer();
 // onteeWindow.setVideoBackground(vid);
 
 onteeWindow.setBackground(
-  image.get(await image.load(`https://bit.ly/3Gvbd6G`))
+  ontee.image.get(await ontee.image.load(`https://bit.ly/3Gvbd6G`))
 );
 
 // onteeWindow.bgm.set(
