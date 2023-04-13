@@ -1,28 +1,49 @@
-import ontee from "../ontee";
+// import ontee from "../ontee";
 
-let onteeWindow = ontee.init("ont");
-let i = 0;
-const sayer = () => {
-  onteeWindow.dialogue.say(
-    "YouME",
-    `오늘은 즐거운 월요일. 일하러 학교에 가지요. 를 ${i}번 말하고 있지요`,
-    () => {
-      i++;
-      sayer();
-    }
-  );
-};
-sayer();
+import RunOnt from "../onteeParser";
+
+// let onteeWindow = ontee.init("ont");
+// let i = 0;
+// const sayer = () => {
+//   onteeWindow.dialogue.say(
+//     "YouME",
+//     `오늘은 즐거운 월요일. 일하러 학교에 가지요. 를 ${i}번 말하고 있지요`,
+//     () => {
+//       i++;
+//       sayer();
+//     }
+//   );
+// };
+// sayer();
 
 // let vid = document.createElement("video");
 // vid.src = `http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4`;
 // onteeWindow.setVideoBackground(vid);
 
-onteeWindow.setBackground(
-  ontee.image.get(await ontee.image.load(`https://bit.ly/3Gvbd6G`))
-);
+// onteeWindow.setBackground(
+//   ontee.image.get(await ontee.image.load(`https://bit.ly/3Gvbd6G`))
+// );
 
 // onteeWindow.bgm.set(
 //   "https://file-examples.com/storage/fe9278ad7f642dbd39ac5c9/2017/11/file_example_MP3_5MG.mp3"
 // );
 // onteeWindow.bgm.play();
+
+document.getElementById("start")?.addEventListener("click", () => {
+  document.getElementById("ont")!.style.display = "";
+  RunOnt(
+    `bgm Audio("https://file-examples.com/storage/fe9278ad7f642dbd39ac5c9/2017/11/file_example_MP3_5MG.mp3");
+  play.bgm;
+  acter me = "나";
+  me "안녕하세요!";
+  
+
+  to Chapter("a");
+  
+  chapter a {
+    me "hi염";
+  }
+  `,
+    "ont"
+  );
+});
