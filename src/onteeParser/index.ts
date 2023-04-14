@@ -2,6 +2,12 @@ import { OnteeWindow } from "./../ontee/types";
 import ontee from "../ontee";
 import { OnteeInitOptions } from "../ontee/types";
 
+const initCodesKey = "  init codes  ";
+const ontParser__log = false;
+const loadSave__log = false;
+const runOnt__log = false;
+const runOnt_saveFile__log = false;
+
 let inited: {
   [key: string]: OnteeWindow;
 } = {};
@@ -10,6 +16,14 @@ let characters: {
   [key: string]: {
     [key: string]: string;
   };
+} = {};
+
+export let saves: {
+  [key: string]: any;
+} = {};
+
+let codeCache: {
+  [key: string]: string;
 } = {};
 
 function logger(type: string, message: string) {
@@ -22,14 +36,15 @@ function logger(type: string, message: string) {
 }
 
 type CommandTypes =
-  | "bg" //
-  | "delay" //
-  | "eval" //
-  | "bgm" //
-  | "to" //
-  | "say" //
-  | "play.bgm" //
-  | "pause.bgm"; //
+  | "bg"
+  | "delay"
+  | "eval"
+  | "bgm"
+  | "to"
+  | "say"
+  | "play.bgm"
+  | "pause.bgm";
+
 interface Command {
   command: CommandTypes;
   type?: string;
@@ -68,12 +83,13 @@ export function OntParser(ontCode: string, ontid: string = "null") {
   const chapterHandler = (i: string) => {
     let fli = trimmer(i.slice(0, i.indexOf("{") + 1));
     chapterName = fli.replace("chapter ", "").replace("{", "").trim();
-    logger("chapter.start", `Chapter name : ${chapterName}`);
+    if (ontParser__log)
+      logger("chapter.start", `Chapter name : ${chapterName}`);
     eacher(i.slice(i.indexOf("{") + 1));
     return;
   };
   const chapterEndHandler = (i: string) => {
-    logger("chapter.end", `Chapter "${chapterName}" done`);
+    if (ontParser__log) logger("chapter.end", `Chapter "${chapterName}" done`);
     chapters[chapterName] = cahpat;
     cahpat = [];
     chapterName = "";
@@ -99,7 +115,7 @@ export function OntParser(ontCode: string, ontid: string = "null") {
     shownName = shownName.replace('"', "");
     shownName = shownName.slice(0, shownName.length - 1);
 
-    logger("acter.new", `${codeName} : ${shownName}`);
+    if (ontParser__log) logger("acter.new", `${codeName} : ${shownName}`);
     acters[codeName] = shownName;
   };
   const newDefineHandler = (str: string) => {
@@ -271,7 +287,7 @@ export function OntParser(ontCode: string, ontid: string = "null") {
   const eacher = (i: string) => {
     i = trimmer(i);
     if (i == "") return;
-    logger("eacher", `Handle ${i.replace(/\n/gi, " ")}`);
+    if (ontParser__log) logger("eacher", `Handle ${i.replace(/\n/gi, " ")}`);
 
     if (i.startsWith("}")) return chapterEndHandler(i);
     if (i.startsWith("chapter ")) return chapterHandler(i);
@@ -291,6 +307,14 @@ export function OntParser(ontCode: string, ontid: string = "null") {
   };
 }
 
+async function fetchOnt(url: string) {
+  if (typeof codeCache[url] != "undefined") return codeCache[url];
+  let res = await fetch(url);
+  let tex = await res.text();
+  codeCache[url] = tex;
+  return tex;
+}
+
 function delay(ms: number) {
   return new Promise<void>((resolve) => {
     setTimeout(resolve, ms);
@@ -299,13 +323,35 @@ function delay(ms: number) {
 
 export default async function RunOnt(
   ontCode: string,
+  filename: string,
   onteeid: string,
-  options?: OnteeInitOptions
+  options?: OnteeInitOptions,
+  runFrom?: {
+    chapter: string;
+    line: number;
+  }
 ) {
   let jsoned = OntParser(ontCode, onteeid);
   if (typeof characters[onteeid] == "undefined")
     characters[onteeid] = jsoned.acters;
   else characters[onteeid] = Object.assign(characters[onteeid], jsoned.acters);
+  if (typeof saves[onteeid] == "undefined") saves[onteeid] = {};
+
+  if (typeof saves[onteeid]["callstack"] == "undefined")
+    saves[onteeid]["callstack"] = [];
+
+  if (typeof saves[onteeid]["bgm"] == "undefined")
+    saves[onteeid]["bgm"] = {
+      playing: false,
+      url: "",
+    };
+
+  if (typeof saves[onteeid]["bg"] == "undefined")
+    saves[onteeid]["bg"] = {
+      data: "#ffffff",
+      type: "c",
+    };
+
   let onteeWindow: OnteeWindow;
   if (typeof inited[onteeid] !== "undefined") onteeWindow = inited[onteeid];
   else {
@@ -313,15 +359,21 @@ export default async function RunOnt(
     onteeWindow = inited[onteeid];
   }
 
+  if (typeof saves[onteeid]["onteeVar"] == "undefined")
+    saves[onteeid]["onteeVar"] = onteeWindow.varables;
+
   const codeExecuter = async (code: Command) => {
     switch (code.command) {
       case "bgm":
+        saves[onteeid]["bgm"]["url"] = code.data!;
         onteeWindow.bgm.set(code.data!);
         return;
       case "play.bgm":
+        saves[onteeid]["bgm"]["playing"] = true;
         onteeWindow.bgm.play();
         return;
       case "pause.bgm":
+        saves[onteeid]["bgm"]["playing"] = false;
         onteeWindow.bgm.pause();
         return;
       case "delay":
@@ -338,14 +390,26 @@ export default async function RunOnt(
             onteeWindow.setBackground(
               ontee.image.get(await ontee.image.load(code.data!))
             );
+            saves[onteeid]["bg"] = {
+              type: "i",
+              data: code.data!,
+            };
             return;
           case "col":
             onteeWindow.setBackground(code.data!);
+            saves[onteeid]["bg"] = {
+              type: "c",
+              data: code.data!,
+            };
             return;
           case "vid":
             let vidOb = document.createElement("video");
             vidOb.src = code.data!;
             onteeWindow.setVideoBackground(vidOb);
+            saves[onteeid]["bg"] = {
+              type: "v",
+              data: code.data!,
+            };
             return;
         }
       case "say":
@@ -359,22 +423,141 @@ export default async function RunOnt(
           );
         });
       case "to":
-        if (code.type! == "cha")
-          return await executeChapter(jsoned.chapters[code.data!]);
+        if (code.type! == "cha") {
+          await executeChapter(jsoned.chapters[code.data!], code.data!);
+        }
         if (code.type! == "url") {
-          const data = await fetch(code.data!);
-          const texted = await data.text();
+          const texted = await fetchOnt(code.data!);
 
-          await RunOnt(texted, onteeid);
+          return await RunOnt(texted, code.data!, onteeid);
         }
     }
   };
 
-  const executeChapter = async (chapter: Command[]) => {
-    for (let i = 0; i < chapter.length; i++) {
-      await codeExecuter(chapter[i]);
-    }
+  const save = () => {
+    saves[onteeid]["onteeVar"] = onteeWindow.varables;
+    if (runOnt_saveFile__log)
+      logger("Save file", JSON.stringify(saves[onteeid], null, 2));
   };
 
-  await executeChapter(jsoned.initCodes);
+  const executeChapter = async (
+    chapter: Command[],
+    chapterName: string,
+    fromLine?: number
+  ) => {
+    if (typeof runFrom === "undefined")
+      saves[onteeid]["callstack"].push({
+        chaptername: chapterName,
+        file: filename,
+        line: fromLine || 0,
+      });
+    save();
+
+    for (let i = fromLine || 0; i < chapter.length; i++) {
+      saves[onteeid]["callstack"][saves[onteeid]["callstack"].length - 1][
+        "line"
+      ] = i;
+
+      save();
+      if (runOnt__log) logger("Run", JSON.stringify(chapter[i], null, 2));
+      await codeExecuter(chapter[i]);
+    }
+    saves[onteeid]["callstack"].pop();
+  };
+
+  if (runFrom) {
+    if (runFrom.chapter == initCodesKey)
+      await executeChapter(jsoned.initCodes, initCodesKey, runFrom.line);
+    else
+      await executeChapter(
+        jsoned.chapters[runFrom.chapter],
+        runFrom.chapter,
+        runFrom.line
+      );
+  } else await executeChapter(jsoned.initCodes, initCodesKey);
+}
+
+export async function loadSave(
+  saveFile: any,
+  mainCode: string,
+  onteeid: string,
+  options?: OnteeInitOptions
+) {
+  saves[onteeid] = JSON.parse(JSON.stringify(saveFile));
+  inited[onteeid] = ontee.init(onteeid, options);
+  inited[onteeid].varables = { ...saveFile["onteeVar"] };
+
+  // Load background
+  switch (saveFile["bg"]["type"]) {
+    case "c":
+      inited[onteeid].setBackground(saveFile["bg"]["data"]);
+      break;
+    case "i":
+      inited[onteeid].setBackground(
+        ontee.image.get(await ontee.image.load(saveFile["bg"]["data"]))
+      );
+      break;
+    case "v":
+      let vidOb = document.createElement("video");
+      vidOb.src = saveFile["bg"]["data"];
+      inited[onteeid].setVideoBackground(vidOb);
+      break;
+  }
+
+  // Load bgm
+  if (
+    saveFile["bgm"]["url"] &&
+    saveFile["bgm"]["url"].length &&
+    saveFile["bgm"]["url"].length > 0
+  ) {
+    inited[onteeid].bgm.set(saveFile["bgm"]["url"]);
+  }
+
+  // Play bgm
+  if (saveFile["bgm"]["playing"]) {
+    inited[onteeid].bgm.play();
+  }
+
+  for (let i = saveFile["callstack"].length - 1; i >= 0; i--) {
+    let addit = saveFile["callstack"].length - 1 == i ? 0 : 1;
+    let callstack = saveFile["callstack"][i] as {
+      chaptername: string;
+      file: string;
+      line: number;
+    };
+
+    let runFrom = {
+      chapter: callstack.chaptername,
+      line: callstack.line + addit,
+    };
+
+    if (loadSave__log)
+      logger(
+        "Loader::Run from",
+        JSON.stringify(
+          {
+            ...runFrom,
+            file: callstack.file,
+          },
+          null,
+          2
+        )
+      );
+
+    if (callstack.file == "Ontee.JS") {
+      // from raw code
+      logger("Save loader", "Run Main Ont");
+      await RunOnt(mainCode, callstack.file, onteeid, options, runFrom);
+      continue;
+    }
+
+    if (loadSave__log) logger("Save loader", "Run Web Ont");
+
+    // from web code
+    let rawCode = await fetchOnt(callstack.file);
+
+    await RunOnt(rawCode, callstack.file, onteeid, options, runFrom);
+
+    if (loadSave__log) logger("Loder::Done", "");
+  }
 }

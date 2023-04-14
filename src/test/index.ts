@@ -1,6 +1,6 @@
 // import ontee from "../ontee";
 
-import RunOnt from "../onteeParser";
+import { loadSave } from "../onteeParser";
 
 // let onteeWindow = ontee.init("ont");
 // let i = 0;
@@ -31,19 +31,29 @@ import RunOnt from "../onteeParser";
 
 document.getElementById("start")?.addEventListener("click", () => {
   document.getElementById("ont")!.style.display = "";
-  RunOnt(
-    `bgm Audio("https://file-examples.com/storage/fe9278ad7f642dbd39ac5c9/2017/11/file_example_MP3_5MG.mp3");
-  play.bgm;
-  acter me = "나";
-  me "안녕하세요!";
-  
-
-  to Chapter("a");
-  
-  chapter a {
-    me "hi염";
-  }
-  `,
+  // RunOnt(
+  //   `
+  // to Ont("/main.ont");
+  // `,
+  //   "Ontee.JS",
+  //   "ont"
+  // );
+  loadSave(
+    {
+      callstack: [
+        { chaptername: "  init codes  ", file: "Ontee.JS", line: 0 },
+        { chaptername: "  init codes  ", file: "/main.ont", line: 2 },
+        { chaptername: "test", file: "/main.ont", line: 1 },
+        { chaptername: "testa", file: "/main.ont", line: 0 },
+      ],
+      bgm: {
+        playing: false,
+        url: "https://file-examples.com/storage/fe7e1395d6643881797b91d/2017/11/file_example_MP3_700KB.mp3",
+      },
+      bg: { data: "#ffffff", type: "c" },
+      onteeVar: {},
+    },
+    `to Ont("/main.ont");`,
     "ont"
   );
 });

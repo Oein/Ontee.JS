@@ -1,0 +1,17 @@
+bgm Audio("https://file-examples.com/storage/fe7e1395d6643881797b91d/2017/11/file_example_MP3_700KB.mp3");
+acter me = "나";
+me "안녕하세요!";
+
+to Chapter("test");
+
+me "retu from test";
+
+chapter test {
+    me "test";
+    to Chapter("testa");
+    me "returned";
+}
+
+chapter testa {
+    me "testa";
+}

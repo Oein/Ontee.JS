@@ -1,0 +1,14 @@
+{
+  "callstack": [
+    { "chaptername": "  init codes  ", "file": "Ontee.JS", "line": 0 },
+    { "chaptername": "  init codes  ", "file": "/main.ont", "line": 2 },
+    { "chaptername": "test", "file": "/main.ont", "line": 1 },
+    { "chaptername": "testa", "file": "/main.ont", "line": 0 }
+  ],
+  "bgm": {
+    "playing": false,
+    "url": "https://file-examples.com/storage/fe7e1395d6643881797b91d/2017/11/file_example_MP3_700KB.mp3"
+  },
+  "bg": { "data": "#ffffff", "type": "c" },
+  "onteeVar": {}
+}
